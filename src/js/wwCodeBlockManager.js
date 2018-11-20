@@ -38,6 +38,7 @@ class WwCodeBlockManager {
 
     this._init();
   }
+
   /**
    * _init
    * Initialize
@@ -147,7 +148,7 @@ class WwCodeBlockManager {
    */
   _mergeCodeblockEachlinesFromHTMLText(html) {
     html = html.replace(/<pre( .*?)?>(.*?)<\/pre>/g, (match, codeAttr, code) => {
-      code = code.replace(/<br \/>/g, '\n');
+      code = code.replace(/<br\s*\/?>/g, '\n');
       code = code.replace(/<div ?(.*?)>/g, '');
       code = code.replace(/\n$/, '');
 
@@ -173,6 +174,7 @@ class WwCodeBlockManager {
     $(node).find('pre').each((index, pre) => {
       const $pre = $(pre);
       const lang = $pre.find('code').attr('data-language');
+      const numberOfBackticks = $pre.find('code').attr('data-backticks');
       let textLines;
 
       // if this pre can have lines
@@ -194,6 +196,9 @@ class WwCodeBlockManager {
       if (lang) {
         $pre.attr('data-language', lang);
         $pre.addClass(`lang-${lang}`);
+      }
+      if (numberOfBackticks) {
+        $pre.attr('data-backticks', numberOfBackticks);
       }
 
       $pre.empty();

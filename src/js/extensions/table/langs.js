@@ -75,4 +75,18 @@ if (i18n) {
     'Cannot change part of merged cell': 'Ви не можете змінювати частину комбінованої комірки.',
     'Cannot paste row merged cells into the table header': 'Ви не можете вставляти об\'єднані комірки в заголовок таблиці.'
   });
+
+  i18n.setLanguage(['tr', 'tr_TR'], {
+    'Merge cells': 'Hücreleri birleştir',
+    'Unmerge cells': 'Hücreleri ayır',
+    'Cannot change part of merged cell': 'Birleştirilmiş hücrelerin bir kısmı değiştirelemez.',
+    'Cannot paste row merged cells into the table header': 'Satırda birleştirilmiş hücreler sütun başlığına yapıştırılamaz'
+  });
+
+  i18n.setLanguage(['fi', 'fi_FI'], {
+    'Merge cells': 'Yhdistä solut',
+    'Unmerge cells': 'Jaa solut',
+    'Cannot change part of merged cell': 'Yhdistettyjen solujen osaa ei voi muuttaa',
+    'Cannot paste row merged cells into the table header': 'Soluja ei voi yhdistää taulukon otsikkoriviin'
+  });
 }

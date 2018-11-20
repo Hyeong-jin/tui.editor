@@ -37,6 +37,8 @@ import mdAddLink from './markdownCommands/addLink';
 import mdAddImage from './markdownCommands/addImage';
 import mdUL from './markdownCommands/ul';
 import mdOL from './markdownCommands/ol';
+import mdIndent from './markdownCommands/indent';
+import mdOutdent from './markdownCommands/outdent';
 import mdTable from './markdownCommands/table';
 import mdTask from './markdownCommands/task';
 import mdCode from './markdownCommands/code';
@@ -61,8 +63,8 @@ import wwTableRemoveRow from './wysiwygCommands/tableRemoveRow';
 import wwTableRemoveCol from './wysiwygCommands/tableRemoveCol';
 import wwTableAlignCol from './wysiwygCommands/tableAlignCol';
 import wwTableRemove from './wysiwygCommands/tableRemove';
-import wwIncreaseDepth from './wysiwygCommands/increaseDepth';
-import wwDecreaseDepth from './wysiwygCommands/decreaseDepth';
+import wwIndent from './wysiwygCommands/indent';
+import wwOutdent from './wysiwygCommands/outdent';
 import wwTask from './wysiwygCommands/task';
 import wwCode from './wysiwygCommands/code';
 import wwCodeBlock from './wysiwygCommands/codeBlock';
@@ -78,6 +80,8 @@ import './langs/de_DE';
 import './langs/ru_RU';
 import './langs/fr_FR';
 import './langs/uk_UA';
+import './langs/tr_TR';
+import './langs/fi_FI';
 
 const __nedInstance = [];
 
@@ -109,10 +113,13 @@ class ToastUIEditor {
          * @param {object} options.hooks - Hook list
              * @param {function} options.hooks.previewBeforeHook - Submit preview to hook URL before preview be shown
              * @param {addImageBlobHook} options.hooks.addImageBlobHook - hook for image upload.
-        * @param {string} language - language
+        * @param {string} [options.language='en_US'] - language
         * @param {boolean} [options.useCommandShortcut=true] - whether use keyboard shortcuts to perform commands
-        * @param {boolean} useDefaultHTMLSanitizer - use default htmlSanitizer
-        * @param {string[]} options.codeBlockLanguages - supported code block languages to be listed
+        * @param {boolean} [options.useDefaultHTMLSanitizer=true] - use default htmlSanitizer
+        * @param {string[]} [options.codeBlockLanguages] - supported code block languages to be listed. default is what highlight.js supports
+        * @param {boolean} [options.usageStatistics=true] - send hostname to google analytics
+        * @param {object[]} [options.toolbarItems] - toolbar items.
+        * @param {boolean} [options.hideModeSwitch=false] - hide mode switch tab bar
     */
   constructor(options) {
     this.options = $.extend({
@@ -123,7 +130,31 @@ class ToastUIEditor {
       language: 'en_US',
       useDefaultHTMLSanitizer: true,
       useCommandShortcut: true,
-      codeBlockLanguages: CodeBlockManager.getHighlightJSLanguages()
+      codeBlockLanguages: CodeBlockManager.getHighlightJSLanguages(),
+      usageStatistics: true,
+      toolbarItems: [
+        'heading',
+        'bold',
+        'italic',
+        'strike',
+        'divider',
+        'hr',
+        'quote',
+        'divider',
+        'ul',
+        'ol',
+        'task',
+        'indent',
+        'outdent',
+        'divider',
+        'table',
+        'image',
+        'link',
+        'divider',
+        'code',
+        'codeblock'
+      ],
+      hideModeSwitch: false
     }, options);
 
     this.eventManager = new EventManager();
@@ -157,9 +188,7 @@ class ToastUIEditor {
 
     this.mdEditor = MarkdownEditor.factory(this.layout.getMdEditorContainerEl(), this.eventManager);
     this.preview = new MarkdownPreview(this.layout.getPreviewEl(), this.eventManager, this.convertor);
-    this.wwEditor = WysiwygEditor.factory(this.layout.getWwEditorContainerEl(), this.eventManager, {
-      useCommandShortcut: this.options.useCommandShortcut
-    });
+    this.wwEditor = WysiwygEditor.factory(this.layout.getWwEditorContainerEl(), this.eventManager);
     this.toMarkOptions = null;
 
     this.changePreviewStyle(this.options.previewStyle);
@@ -179,6 +208,10 @@ class ToastUIEditor {
     __nedInstance.push(this);
 
     this._addDefaultCommands();
+
+    if (this.options.usageStatistics) {
+      util.sendHostname('editor');
+    }
   }
 
   /**
@@ -217,6 +250,8 @@ class ToastUIEditor {
     this.addCommand(mdAddImage);
     this.addCommand(mdUL);
     this.addCommand(mdOL);
+    this.addCommand(mdIndent);
+    this.addCommand(mdOutdent);
     this.addCommand(mdTable);
     this.addCommand(mdTask);
     this.addCommand(mdCode);
@@ -233,8 +268,8 @@ class ToastUIEditor {
     this.addCommand(wwHR);
     this.addCommand(wwHeading);
     this.addCommand(wwParagraph);
-    this.addCommand(wwIncreaseDepth);
-    this.addCommand(wwDecreaseDepth);
+    this.addCommand(wwIndent);
+    this.addCommand(wwOutdent);
     this.addCommand(wwTask);
     this.addCommand(wwTable);
     this.addCommand(wwTableAddRow);
@@ -472,10 +507,10 @@ class ToastUIEditor {
   height(height) {
     if (util.isExisty(height)) {
       if (height === 'auto') {
-        this.options.el.classList.add('auto-height');
+        $(this.options.el).addClass('auto-height');
         this.minHeight(this.minHeight());
       } else {
-        this.options.el.classList.remove('auto-height');
+        $(this.options.el).removeClass('auto-height');
         this.minHeight(height);
       }
       if (util.isNumber(height)) {
@@ -779,6 +814,7 @@ ToastUIEditor.codeBlockManager = codeBlockManager;
 /**
  * Button class
  * @type {Class.<Button>}
+ * @deprecated
  */
 ToastUIEditor.Button = Button;
 
